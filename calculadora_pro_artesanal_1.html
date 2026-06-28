@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Pro — Emprendedoras Artesanales</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F5EED8;min-height:100vh;padding:1rem;color:#2C1A0E}
+  .app{max-width:480px;margin:0 auto}
+
+  /* Bienvenida */
+  .welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:2rem 1rem}
+  .welcome-logo{width:80px;height:80px;background:#3A4A2C;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:1.5rem;box-shadow:0 4px 16px rgba(58,74,44,.25)}
+  .welcome h1{font-size:26px;font-weight:700;color:#3A4A2C;margin-bottom:.5rem;line-height:1.2}
+  .welcome .tagline{font-size:14px;color:#7A6A50;margin-bottom:2rem;line-height:1.6;max-width:320px}
+  .welcome-features{background:#fff;border-radius:16px;padding:1.25rem;margin-bottom:2rem;text-align:left;width:100%;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  .feature-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13px;color:#2C1A0E}
+  .feature-item:last-child{margin-bottom:0}
+  .feature-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+  .feature-text strong{display:block;font-size:13px;font-weight:600;color:#3A4A2C}
+  .feature-text span{font-size:12px;color:#7A6A50}
+  .start-btn{width:100%;padding:16px;background:#3A4A2C;color:#F5EED8;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.02em;margin-bottom:1rem}
+  .start-btn:hover{background:#2C3A20}
+  .creator-tag{font-size:11px;color:#9A8A70}
+  .creator-tag a{color:#B27040;text-decoration:none;font-weight:600}
+
+  /* App */
+  .app-screen{display:none}
+  .header{text-align:center;padding:1.25rem 0 1rem}
+  .header h1{font-size:20px;font-weight:700;color:#3A4A2C;letter-spacing:.06em;text-transform:uppercase}
+  .header p{font-size:12px;color:#7A6A50;margin-top:3px}
+  .tab-bar{display:flex;background:#E8DFC4;border-radius:14px;padding:4px;gap:3px;margin-bottom:1.25rem}
+  .tab{flex:1;padding:8px 2px;text-align:center;font-size:10px;font-weight:600;cursor:pointer;border-radius:10px;border:none;background:transparent;color:#7A6A50;transition:.15s;font-family:inherit}
+  .tab.active{background:#fff;color:#3A4A2C;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .tab-icon{display:block;font-size:15px;margin-bottom:2px}
+  .panel{display:none}.panel.active{display:block}
+  .card{background:#fff;border-radius:16px;padding:1.25rem;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:.07em;color:#B27040;text-transform:uppercase;margin-bottom:12px}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:12px;color:#7A6A50;margin-bottom:4px;font-weight:500}
+  .field input,.field select{width:100%;padding:10px 12px;border:1.5px solid #E0D4B8;border-radius:10px;font-size:14px;background:#FDFAF3;color:#2C1A0E;outline:none;transition:.15s;font-family:inherit}
+  .field input:focus,.field select:focus{border-color:#B27040;background:#fff}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  /* Materiales */
+  .mat-card{background:#FDFAF3;border:1.5px solid #E0D4B8;border-radius:12px;padding:12px;margin-bottom:10px}
+  .mat-nombre-input{width:100%;padding:8px 10px;border:1.5px solid #E0D4B8;border-radius:8px;font-size:14px;font-weight:600;background:#fff;color:#2C1A0E;outline:none;font-family:inherit;margin-bottom:10px}
+  .mat-nombre-input:focus{border-color:#B27040}
+  .mat-section-label{font-size:10px;font-weight:700;color:#9A8A70;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+  .mat-section-label.used{color:#B27040}
+  .mat-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+  .mat-field label{display:block;font-size:10px;color:#9A8A70;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+  .mat-field input,.mat-field select{width:100%;padding:7px 9px;border:1.5px solid #E0D4B8;border-radius:8px;font-size:13px;background:#fff;color:#2C1A0E;outline:none;font-family:inherit}
+  .mat-field input:focus,.mat-field select:focus{border-color:#B27040}
+  .mat-field input[readonly]{background:#F0E8D4;color:#7A6A50;cursor:default}
+  .mat-calc-hint{font-size:12px;color:#3A4A2C;background:#E8F4EE;border-radius:8px;padding:7px 10px;text-align:center;font-weight:500}
+  .mat-calc-hint.empty{background:#F0E8D4;color:#9A8A70;font-weight:400}
+
+  /* Gastos */
+  .gasto-head{display:grid;grid-template-columns:1fr 100px 34px;gap:6px;margin-bottom:4px}
+  .gasto-head span{font-size:10px;font-weight:600;color:#9A8A70;text-transform:uppercase;letter-spacing:.04em}
+  .gasto-row{display:grid;grid-template-columns:1fr 100px 34px;gap:6px;align-items:center;margin-bottom:6px}
+  .gasto-row input{padding:8px 10px;border:1.5px solid #E0D4B8;border-radius:8px;font-size:13px;background:#FDFAF3;color:#2C1A0E;width:100%;outline:none;font-family:inherit}
+
+  /* Botones */
+  .add-btn{display:flex;align-items:center;gap:6px;font-size:13px;color:#B27040;background:none;border:1.5px dashed #D4BC94;border-radius:8px;padding:8px 14px;cursor:pointer;width:100%;justify-content:center;margin-top:4px;font-family:inherit;transition:.15s}
+  .add-btn:hover{background:#FDF5E6}
+  .del-btn{background:none;border:none;cursor:pointer;color:#C0AE94;font-size:13px;padding:4px 6px;border-radius:6px;font-family:inherit;transition:.15s}
+  .del-btn:hover{color:#C0392B;background:#FDE8E8}
+  .next-btn{width:100%;padding:13px;background:#3A4A2C;color:#F5EED8;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;font-family:inherit;transition:.15s}
+  .next-btn:hover{background:#2C3A20}
+  .total-row{display:flex;justify-content:space-between;align-items:center;background:#F5EED8;border-radius:10px;padding:10px 14px;margin-top:10px}
+  .total-row span:first-child{font-size:13px;color:#7A6A50;font-weight:500}
+  .total-row span:last-child{font-size:16px;font-weight:700;color:#3A4A2C}
+
+  /* Timer */
+  .timer-display{font-size:52px;font-weight:300;text-align:center;color:#3A4A2C;font-variant-numeric:tabular-nums;padding:1rem 0 .5rem;letter-spacing:.04em}
+  .timer-btns{display:flex;gap:8px;justify-content:center;margin-bottom:1.5rem}
+  .timer-start{padding:10px 24px;background:#3A4A2C;color:#F5EED8;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+  .timer-reset{padding:10px 16px;background:transparent;color:#7A6A50;border:1.5px solid #D4BC94;border-radius:10px;font-size:14px;cursor:pointer;font-family:inherit}
+
+  /* Slider */
+  .slider-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .slider-row label{font-size:12px;color:#7A6A50;font-weight:500;min-width:130px}
+  .slider-row input[type=range]{flex:1;accent-color:#B27040}
+  .slider-val{font-size:13px;font-weight:700;color:#3A4A2C;min-width:38px;text-align:right}
+
+  /* Resultado */
+  .precio-grande{font-size:48px;font-weight:700;color:#3A4A2C;text-align:center;padding:1rem 0 .25rem;line-height:1}
+  .precio-label{text-align:center;font-size:12px;color:#7A6A50;margin-bottom:1rem}
+  .metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .metric{background:#F5EED8;border-radius:12px;padding:.75rem;text-align:center}
+  .metric-lbl{font-size:10px;color:#7A6A50;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+  .metric-val{font-size:17px;font-weight:700;color:#3A4A2C}
+  .metric-val.green{color:#2E7D52}
+  .metric-val.red{color:#C0392B}
+  .br-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px;border-bottom:1px solid #F0E8D4}
+  .br-row:last-child{border-bottom:none}
+  .br-label{color:#7A6A50}
+  .br-val{font-weight:600;color:#2C1A0E}
+  .presupuesto-box{background:#FDFAF3;border:1.5px solid #E0D4B8;border-radius:12px;padding:1rem;font-size:13px;line-height:1.8;color:#2C1A0E;white-space:pre-wrap;font-family:'Courier New',monospace;margin-bottom:12px;max-height:240px;overflow-y:auto}
+  .share-btns{display:flex;gap:8px;flex-wrap:wrap}
+  .btn-wa{flex:1;padding:12px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+  .btn-copy{flex:1;padding:12px;background:transparent;color:#3A4A2C;border:1.5px solid #D4BC94;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+  .badge.ok{background:#D4EDDA;color:#155724}
+  .badge.warn{background:#FFF3CD;color:#856404}
+  .badge.bad{background:#F8D7DA;color:#721C24}
+
+  /* Footer */
+  .footer-credit{text-align:center;padding:1.5rem 0 .5rem;font-size:11px;color:#9A8A70}
+  .footer-credit a{color:#B27040;text-decoration:none;font-weight:600}
+
+  /* Nuevo producto */
+  .nuevo-btn{width:100%;padding:11px;background:transparent;color:#B27040;border:1.5px solid #D4BC94;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px}
+  .nuevo-btn:hover{background:#FDF5E6}
+</style>
+</head>
+<body>
+
+<!-- PANTALLA DE BIENVENIDA -->
+<div class="welcome" id="welcome-screen">
+  <div class="welcome-logo">🧵</div>
+  <h1>Calculadora Pro<br>para Artesanas</h1>
+  <p class="tagline">Calculá el precio justo de tus productos artesanales en segundos — sin quedarte corta ni perder plata.</p>
+
+  <div class="welcome-features">
+    <div class="feature-item">
+      <span class="feature-icon">🧶</span>
+      <div class="feature-text">
+        <strong>Materiales por metro, cm o gramo</strong>
+        <span>Ingresá lo que pagaste y cuánto usaste — la calculadora hace el resto.</span>
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">⏱️</span>
+      <div class="feature-text">
+        <strong>Tu hora de trabajo vale</strong>
+        <span>Incluí tu tiempo real con el cronómetro integrado.</span>
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">💰</span>
+      <div class="feature-text">
+        <strong>Precio sugerido con margen real</strong>
+        <span>Ajustá la ganancia y la comisión de plataforma al instante.</span>
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">📲</span>
+      <div class="feature-text">
+        <strong>Presupuesto listo para WhatsApp</strong>
+        <span>Un toque y tu presupuesto sale con tus datos y precio.</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="start-btn" onclick="iniciar()">¡Empezar a calcular! →</button>
+  <p class="creator-tag">Creado por <a href="https://chirimbolos.com.ar" target="_blank">Chirimbolos</a> · chirimbolos.com.ar</p>
+</div>
+
+<!-- APP PRINCIPAL -->
+<div class="app-screen" id="app-screen">
+<div class="app">
+  <div class="header">
+    <h1>Calculadora Pro</h1>
+    <p>para emprendedoras artesanales</p>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab('config')"><span class="tab-icon">⚙️</span>Config</button>
+    <button class="tab" onclick="showTab('materiales')"><span class="tab-icon">🧵</span>Materiales</button>
+    <button class="tab" onclick="showTab('tiempo')"><span class="tab-icon">⏱️</span>Tiempo</button>
+    <button class="tab" onclick="showTab('gastos')"><span class="tab-icon">🧾</span>Gastos</button>
+    <button class="tab" onclick="showTab('resultado')"><span class="tab-icon">💰</span>Precio</button>
+  </div>
+
+  <!-- CONFIG -->
+  <div id="panel-config" class="panel active">
+    <div class="card">
+      <div class="card-title">Datos de tu emprendimiento</div>
+      <div class="field"><label>Nombre de tu marca</label><input type="text" id="marca" placeholder="Ej: Mi emprendimiento" oninput="calcAll()"></div>
+      <div class="row2">
+        <div class="field"><label>Instagram</label><input type="text" id="ig" placeholder="@tuusuario"></div>
+        <div class="field"><label>WhatsApp</label><input type="text" id="wa" placeholder="+54 9 ..."></div>
+      </div>
+      <div class="field"><label>Web / link de ventas</label><input type="text" id="web" placeholder="tuweb.com.ar"></div>
+      <div class="field"><label>Moneda</label>
+        <select id="moneda" oninput="calcAll()">
+          <option value="$">$ Peso argentino</option>
+          <option value="USD">USD Dólar</option>
+          <option value="€">€ Euro</option>
+        </select>
+      </div>
+      <div class="field"><label>¿Cuánto vale tu hora de trabajo? ($)</label><input type="number" id="valorHora" placeholder="Ej: 2000" min="0" step="100" oninput="calcAll()"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Producto a calcular</div>
+      <div class="field"><label>Nombre del producto</label><input type="text" id="producto" placeholder="Ej: Bolsa tote personalizada" oninput="calcAll()"></div>
+      <div class="field"><label>Descripción breve</label><input type="text" id="descripcion" placeholder="Ej: Hecha a mano, única e irrepetible."></div>
+      <div class="field"><label>Cantidad a producir</label><input type="number" id="cantidad" value="1" min="1" step="1" oninput="calcAll()"></div>
+    </div>
+    <button class="next-btn" onclick="showTab('materiales')">Agregar materiales →</button>
+  </div>
+
+  <!-- MATERIALES -->
+  <div id="panel-materiales" class="panel">
+    <div class="card">
+      <div class="card-title">Materiales utilizados</div>
+      <p style="font-size:12px;color:#9A8A70;margin-bottom:12px">Ingresá el precio total que pagaste y cuánto usaste. La calculadora deduce el costo exacto por cm, gramo o unidad.</p>
+      <div id="mat-list"></div>
+      <button class="add-btn" onclick="addMat()">+ Agregar material</button>
+      <div class="total-row"><span>Total materiales</span><span id="totalMat">$0</span></div>
+    </div>
+    <button class="next-btn" onclick="showTab('tiempo')">Tiempo de trabajo →</button>
+  </div>
+
+  <!-- TIEMPO -->
+  <div id="panel-tiempo" class="panel">
+    <div class="card">
+      <div class="card-title">Cronómetro</div>
+      <div class="timer-display" id="timerDisplay">00:00:00</div>
+      <div class="timer-btns">
+        <button class="timer-start" onclick="toggleTimer()" id="timerBtn">▶ Iniciar tiempo</button>
+        <button class="timer-reset" onclick="resetTimer()">↺ Reiniciar</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">O ingresá manualmente</div>
+      <div class="row2">
+        <div class="field"><label>Horas trabajadas</label><input type="number" id="horas" value="0" min="0" step="0.5" oninput="calcAll()"></div>
+        <div class="field"><label>Minutos adicionales</label><input type="number" id="minutos" value="0" min="0" max="59" step="5" oninput="calcAll()"></div>
+      </div>
+      <div class="total-row"><span>Costo mano de obra</span><span id="totalMano">$0</span></div>
+    </div>
+    <button class="next-btn" onclick="showTab('gastos')">Agregar otros gastos →</button>
+  </div>
+
+  <!-- GASTOS -->
+  <div id="panel-gastos" class="panel">
+    <div class="card">
+      <div class="card-title">Otros gastos</div>
+      <p style="font-size:12px;color:#9A8A70;margin-bottom:12px">Packaging, envío, comisiones, etiquetas — todo lo que no es material ni tu tiempo.</p>
+      <div class="gasto-head"><span>Tipo de gasto</span><span>Costo ($)</span><span></span></div>
+      <div id="gasto-list"></div>
+      <button class="add-btn" onclick="addGasto()">+ Agregar gasto</button>
+      <div class="total-row"><span>Total otros gastos</span><span id="totalGastos">$0</span></div>
+    </div>
+    <button class="next-btn" onclick="showTab('resultado')">Ver precio sugerido →</button>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="panel-resultado" class="panel">
+    <div class="card">
+      <div class="card-title">Ajustá tu ganancia</div>
+      <div class="slider-row">
+        <label>Margen de ganancia</label>
+        <input type="range" id="margen" min="10" max="200" step="5" value="40" oninput="calcAll();document.getElementById('margenVal').textContent=this.value+'%'">
+        <span class="slider-val" id="margenVal">40%</span>
+      </div>
+      <div class="slider-row">
+        <label>Comisión plataforma</label>
+        <input type="range" id="comision" min="0" max="20" step="0.5" value="6" oninput="calcAll();document.getElementById('comisionVal').textContent=this.value+'%'">
+        <span class="slider-val" id="comisionVal">6%</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="precio-grande" id="precioFinal">$0</div>
+      <div class="precio-label">Precio de venta sugerido <span class="badge ok" id="margenBadge">40% margen</span></div>
+      <div class="metric-grid">
+        <div class="metric"><div class="metric-lbl">Costo total</div><div class="metric-val" id="mCosto">$0</div></div>
+        <div class="metric"><div class="metric-lbl">Tu ganancia</div><div class="metric-val green" id="mGanancia">$0</div></div>
+        <div class="metric"><div class="metric-lbl">Margen real</div><div class="metric-val" id="mMargen">0%</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Desglose de costos</div>
+      <div class="br-row"><span class="br-label">Materiales</span><span class="br-val" id="bMat">$0</span></div>
+      <div class="br-row"><span class="br-label">Mano de obra</span><span class="br-val" id="bMano">$0</span></div>
+      <div class="br-row"><span class="br-label">Otros gastos</span><span class="br-val" id="bGastos">$0</span></div>
+      <div class="br-row"><span class="br-label">Comisión plataforma</span><span class="br-val" id="bCom">$0</span></div>
+      <div class="br-row" style="font-weight:700;font-size:14px"><span>Precio de venta</span><span id="bPrecio" style="color:#2E7D52">$0</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Presupuesto para compartir</div>
+      <div class="presupuesto-box" id="presupuesto"></div>
+      <div class="share-btns">
+        <button class="btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+        <button class="btn-copy" onclick="copyPres()" id="copyBtn">📋 Copiar</button>
+      </div>
+      <button class="nuevo-btn" onclick="nuevoProducto()">+ Calcular otro producto</button>
+    </div>
+
+    <div class="footer-credit">
+      Calculadora creada por <a href="https://chirimbolos.com.ar" target="_blank">Chirimbolos</a> · chirimbolos.com.ar
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+let matId=0,gastoId=0,timerSecs=0,timerRunning=false,timerInterval=null;
+
+const UNIDADES=[
+  {val:'m',   label:'Metro (m)',       factor:100},
+  {val:'cm',  label:'Centímetro (cm)', factor:1},
+  {val:'mm',  label:'Milímetro (mm)',  factor:0.1},
+  {val:'m2',  label:'Metro² (m²)',     factor:10000},
+  {val:'cm2', label:'Cm² (cm²)',       factor:1},
+  {val:'g',   label:'Gramo (g)',       factor:1},
+  {val:'kg',  label:'Kilogramo (kg)',  factor:1000},
+  {val:'u',   label:'Unidad (u)',      factor:1},
+  {val:'ml',  label:'Mililitro (ml)',  factor:1},
+  {val:'l',   label:'Litro (l)',       factor:1000},
+];
+
+function getUnitFactor(u){return(UNIDADES.find(x=>x.val===u)||{factor:1}).factor}
+function unitOpts(sel){return UNIDADES.map(u=>`<option value="${u.val}"${u.val===sel?' selected':''}>${u.label}</option>`).join('')}
+
+function iniciar(){
+  document.getElementById('welcome-screen').style.display='none';
+  document.getElementById('app-screen').style.display='block';
+}
+
+function showTab(name){
+  const names=['config','materiales','tiempo','gastos','resultado'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',names[i]===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  calcAll();
+}
+
+function addMat(nombre='',precioTotal=0,cantTotal=1,unidadTotal='m',cantUsada=0,unidadUsada='cm'){
+  const id=matId++;
+  const div=document.createElement('div');
+  div.className='mat-card';div.id='mrow-'+id;
+  div.innerHTML=`
+    <input class="mat-nombre-input" type="text" placeholder="Nombre del material (ej: tela de lino)" value="${nombre}" oninput="calcAll()">
+    <div class="mat-section-label">📦 Lo que compraste</div>
+    <div class="mat-fields">
+      <div class="mat-field"><label>Precio pagado ($)</label><input type="number" min="0" step="100" value="${precioTotal}" id="mp-${id}" oninput="calcMat(${id})"></div>
+      <div class="mat-field"><label>Cantidad total</label><input type="number" min="0" step="0.1" value="${cantTotal}" id="mct-${id}" oninput="calcMat(${id})"></div>
+      <div class="mat-field"><label>Unidad</label><select id="mut-${id}" onchange="calcMat(${id})">${unitOpts(unidadTotal)}</select></div>
+    </div>
+    <div class="mat-section-label used">✂️ Lo que usaste</div>
+    <div class="mat-fields">
+      <div class="mat-field"><label>Cantidad usada</label><input type="number" min="0" step="0.1" value="${cantUsada}" id="mcu-${id}" oninput="calcMat(${id})"></div>
+      <div class="mat-field"><label>Unidad</label><select id="muu-${id}" onchange="calcMat(${id})">${unitOpts(unidadUsada)}</select></div>
+      <div class="mat-field"><label>Precio x unidad</label><input type="text" id="mpxu-${id}" readonly></div>
+    </div>
+    <div class="mat-calc-hint empty" id="mhint-${id}">Completá los campos para ver el cálculo</div>
+    <div style="text-align:right;margin-top:8px"><button class="del-btn" onclick="document.getElementById('mrow-${id}').remove();calcAll()">✕ quitar</button></div>`;
+  document.getElementById('mat-list').appendChild(div);
+  calcMat(id);
+}
+
+function calcMat(id){
+  const pt=parseFloat(document.getElementById('mp-'+id)?.value)||0;
+  const ct=parseFloat(document.getElementById('mct-'+id)?.value)||1;
+  const ut=document.getElementById('mut-'+id)?.value||'u';
+  const cu=parseFloat(document.getElementById('mcu-'+id)?.value)||0;
+  const uu=document.getElementById('muu-'+id)?.value||'u';
+  const ft=getUnitFactor(ut),fu=getUnitFactor(uu);
+  const totalBase=ct*ft,usadaBase=cu*fu;
+  let sub=0,hint='',pxuTxt='';
+  if(totalBase>0){
+    const pxu=pt/totalBase;
+    sub=usadaBase*pxu;
+    const uLabel=ut==='m'||ut==='cm'||ut==='mm'?'cm':ut==='m2'||ut==='cm2'?'cm²':ut==='kg'||ut==='g'?'g':ut==='l'||ut==='ml'?'ml':'u';
+    pxuTxt=`${fmt(pxu)}/${uLabel}`;
+    hint=cu>0?`${cu} ${uu} × ${pxuTxt} = ${fmt(sub)}`:'Ingresá la cantidad usada';
+    const hEl=document.getElementById('mhint-'+id);
+    if(hEl){hEl.textContent=hint;hEl.className='mat-calc-hint'+(cu>0?'':' empty')}
+  }else{
+    const hEl=document.getElementById('mhint-'+id);
+    if(hEl){hEl.textContent='Ingresá el precio y cantidad comprada';hEl.className='mat-calc-hint empty'}
+  }
+  const pxuEl=document.getElementById('mpxu-'+id);
+  if(pxuEl)pxuEl.value=pxuTxt;
+  window['_matsub_'+id]=sub;
+  calcAll();
+}
+
+function getMatTotal(){
+  let t=0;
+  document.querySelectorAll('.mat-card').forEach(row=>{
+    const id=row.id.replace('mrow-','');
+    t+=window['_matsub_'+id]||0;
+  });
+  return t;
+}
+
+function addGasto(nombre='',costo=0){
+  const id=gastoId++;
+  const div=document.createElement('div');
+  div.className='gasto-row';div.id='grow-'+id;
+  div.innerHTML=`
+    <input type="text" placeholder="Packaging, envío..." value="${nombre}" oninput="calcAll()">
+    <input type="number" min="0" step="100" value="${costo}" id="gc-${id}" oninput="calcAll()" placeholder="$">
+    <button class="del-btn" onclick="document.getElementById('grow-${id}').remove();calcAll()">✕</button>`;
+  document.getElementById('gasto-list').appendChild(div);calcAll();
+}
+
+function getGastoTotal(){
+  let t=0;
+  document.querySelectorAll('.gasto-row').forEach(row=>{
+    const id=row.id.replace('grow-','');
+    t+=parseFloat(document.getElementById('gc-'+id)?.value)||0;
+  });
+  return t;
+}
+
+function fmt(n){
+  const mon=document.getElementById('moneda')?.value||'$';
+  return mon+' '+Math.round(n).toLocaleString('es-AR');
+}
+
+function calcAll(){
+  const mat=getMatTotal();
+  const horas=(parseFloat(document.getElementById('horas')?.value)||0)+(parseFloat(document.getElementById('minutos')?.value)||0)/60;
+  const vh=parseFloat(document.getElementById('valorHora')?.value)||0;
+  const mano=horas*vh;
+  const gastos=getGastoTotal();
+  const margen=(parseFloat(document.getElementById('margen')?.value)||40)/100;
+  const comPct=(parseFloat(document.getElementById('comision')?.value)||6)/100;
+  const cant=Math.max(1,parseInt(document.getElementById('cantidad')?.value)||1);
+  const costoBase=mat+mano+gastos;
+  const precioSinCom=costoBase*(1+margen);
+  const precio=comPct<1?precioSinCom/(1-comPct):precioSinCom;
+  const comMonto=precio*comPct;
+  const ganancia=precio-costoBase-comMonto;
+  const margenR=costoBase>0?(ganancia/costoBase*100):0;
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+  s('totalMat',fmt(mat));s('totalMano',fmt(mano));s('totalGastos',fmt(gastos));
+  s('precioFinal',fmt(precio));s('mCosto',fmt(costoBase+comMonto));s('mGanancia',fmt(ganancia));
+  const mr=Math.round(margenR);
+  s('mMargen',mr+'%');
+  const mEl=document.getElementById('mMargen');
+  if(mEl)mEl.className='metric-val'+(mr>=30?' green':mr>=0?'':' red');
+  const badge=document.getElementById('margenBadge');
+  if(badge){badge.textContent=mr+'% margen';badge.className='badge'+(mr>=30?' ok':mr>=15?' warn':' bad')}
+  s('bMat',fmt(mat));s('bMano',fmt(mano));s('bGastos',fmt(gastos));s('bCom',fmt(comMonto));
+  const bp=document.getElementById('bPrecio');if(bp)bp.textContent=fmt(precio);
+  generarPres(precio,mat,mano,gastos,cant);
+  window._precio=precio;
+}
+
+function generarPres(precio,mat,mano,gastos,cant){
+  const g=id=>document.getElementById(id)?.value||'';
+  const marca=g('marca')||'Mi emprendimiento';
+  const ig=g('ig');const web=g('web');const wa=g('wa');
+  const prod=g('producto')||'Producto artesanal';
+  const desc=g('descripcion');
+  const mon=document.getElementById('moneda')?.value||'$';
+  const fN=n=>mon+' '+Math.round(n).toLocaleString('es-AR');
+  const txt=`━━━━━━━━━━━━━━━━━━━
+✨ ${marca}${ig?' · '+ig:''}
+${web||''}
+━━━━━━━━━━━━━━━━━━━
+
+📦 PRESUPUESTO
+
+Producto: ${prod}
+${desc?desc+'\n':''}Cantidad: ${cant} unidad${cant>1?'es':''}
+
+💰 Precio por unidad: ${fN(precio)}
+${cant>1?'💰 Total: '+fN(precio*cant)+'\n':''}
+Incluye:
+• Materiales artesanales: ${fN(mat)}
+• Mano de obra: ${fN(mano)}
+• Otros gastos: ${fN(gastos)}
+
+━━━━━━━━━━━━━━━━━━━
+📲 Consultas por este medio
+${wa?'📞 '+wa+'\n':''}${web?'🌐 '+web:''}
+━━━━━━━━━━━━━━━━━━━`;
+  const el=document.getElementById('presupuesto');if(el)el.textContent=txt;
+  window._texPres=txt;
+}
+
+function shareWA(){
+  const wa=(document.getElementById('wa')?.value||'').replace(/\D/g,'');
+  const txt=encodeURIComponent(window._texPres||'');
+  window.open(wa?`https://wa.me/${wa}?text=${txt}`:`https://wa.me/?text=${txt}`,'_blank');
+}
+
+function copyPres(){
+  navigator.clipboard.writeText(window._texPres||'').then(()=>{
+    const btn=document.getElementById('copyBtn');
+    btn.textContent='✓ Copiado';setTimeout(()=>{btn.textContent='📋 Copiar';},2000);
+  });
+}
+
+function toggleTimer(){
+  if(timerRunning){
+    clearInterval(timerInterval);timerRunning=false;
+    document.getElementById('timerBtn').textContent='▶ Continuar';
+    const tm=Math.floor(timerSecs/60);
+    document.getElementById('horas').value=Math.floor(tm/60);
+    document.getElementById('minutos').value=tm%60;
+    calcAll();
+  }else{
+    timerRunning=true;
+    document.getElementById('timerBtn').textContent='⏸ Pausar';
+    timerInterval=setInterval(()=>{
+      timerSecs++;
+      const h=String(Math.floor(timerSecs/3600)).padStart(2,'0');
+      const m=String(Math.floor((timerSecs%3600)/60)).padStart(2,'0');
+      const s=String(timerSecs%60).padStart(2,'0');
+      document.getElementById('timerDisplay').textContent=`${h}:${m}:${s}`;
+    },1000);
+  }
+}
+
+function resetTimer(){
+  clearInterval(timerInterval);timerRunning=false;timerSecs=0;
+  document.getElementById('timerDisplay').textContent='00:00:00';
+  document.getElementById('timerBtn').textContent='▶ Iniciar tiempo';
+}
+
+function nuevoProducto(){
+  document.getElementById('producto').value='';
+  document.getElementById('descripcion').value='';
+  document.getElementById('cantidad').value=1;
+  document.getElementById('mat-list').innerHTML='';
+  document.getElementById('gasto-list').innerHTML='';
+  document.getElementById('horas').value=0;
+  document.getElementById('minutos').value=0;
+  resetTimer();
+  addMat();addGasto();
+  showTab('materiales');
+}
+
+calcAll();
+</script>
+</body>
+</html>
